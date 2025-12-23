@@ -4,7 +4,7 @@ export enum TransactionType {
   EXPENSE = 'EXPENSE'
 }
 
-export type CompanyType = 'SPA' | 'FISIOTERAPIA';
+export type CompanyType = 'SPA';
 export type ProfessionalType = 'Erika' | 'Edilene';
 
 export interface Transaction {
@@ -24,7 +24,9 @@ export interface CashFlowSummary {
   balance: number;
 }
 
-// FIX: Add AIInsightResponse interface to be used by Gemini service and AIInsights component.
+/**
+ * Added missing interface to support structured AI insight responses
+ */
 export interface AIInsightResponse {
   summary: string;
   suggestions: string[];

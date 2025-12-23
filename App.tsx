@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { PlusCircle, Wallet, TrendingUp, History, BarChart3, Building2, Calendar, Download, ChevronLeft, ChevronRight, Coins } from 'lucide-react';
+import { PlusCircle, Wallet, History, BarChart3, Calendar, ChevronLeft, ChevronRight, Coins } from 'lucide-react';
 import { Transaction, TransactionType, CashFlowSummary, CompanyType } from './types';
 import SummaryCards from './components/SummaryCards';
 import TransactionForm from './components/TransactionForm';
 import TransactionList from './components/TransactionList';
 import CashFlowChart from './components/CashFlowChart';
 import ErikaEarningsList from './components/ErikaEarningsList';
+// Import AI Insights component to fix unused file/missing integration
+import AIInsights from './components/AIInsights';
 
 const MONTHS = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -19,10 +21,8 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : [];
   });
   
-  const [selectedCompany, setSelectedCompany] = useState<CompanyType>(() => {
-    const saved = localStorage.getItem('selectedCompany');
-    return (saved as CompanyType) || 'SPA';
-  });
+  // Agora fixo em SPA
+  const [selectedCompany] = useState<CompanyType>('SPA');
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -31,10 +31,6 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('transactions', JSON.stringify(transactions));
   }, [transactions]);
-
-  useEffect(() => {
-    localStorage.setItem('selectedCompany', selectedCompany);
-  }, [selectedCompany]);
 
   const changeMonth = (increment: number) => {
     const newDate = new Date(selectedDate);
@@ -73,7 +69,7 @@ const App: React.FC = () => {
 
     setTransactions(prev => {
       const newList = [transaction, ...prev];
-      if (selectedCompany === 'SPA' && transaction.type === TransactionType.INCOME && transaction.professional === 'Erika') {
+      if (transaction.type === TransactionType.INCOME && transaction.professional === 'Erika') {
         const commissionExpense: Transaction = {
           id: Math.random().toString(36).substring(2, 10),
           date: transaction.date,
@@ -100,87 +96,78 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-20 md:pb-0 font-sans print:bg-white">
       <header className="bg-white border-b sticky top-0 z-30 px-4 py-4 md:px-8 print:hidden">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-6 w-full md:w-auto">
-            <div className="flex items-center gap-2">
-              <div className="bg-indigo-600 p-2 rounded-lg">
-                <Wallet className="text-white w-6 h-6" />
-              </div>
-              <h1 className="text-xl font-bold text-slate-800 tracking-tight whitespace-nowrap">Fluxo Pro</h1>
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="bg-indigo-600 p-2 rounded-lg">
+              <Wallet className="text-white w-6 h-6" />
             </div>
-
-            <div className="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto">
-              <button
-                onClick={() => setSelectedCompany('SPA')}
-                className={`flex-1 md:flex-none px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                  selectedCompany === 'SPA' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                }`}
-              >
-                SPA
-              </button>
-              <button
-                onClick={() => setSelectedCompany('FISIOTERAPIA')}
-                className={`flex-1 md:flex-none px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                  selectedCompany === 'FISIOTERAPIA' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                }`}
-              >
-                FISIOTERAPIA
-              </button>
-            </div>
+            <h1 className="text-xl font-bold text-slate-800 tracking-tight whitespace-nowrap">Fluxo Pro - SPA</h1>
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-100">
-              <Building2 className="w-4 h-4 text-slate-400" />
-              <span className="text-xs font-bold text-slate-600 uppercase tracking-wide">Unidade: {selectedCompany}</span>
-            </div>
-            <button onClick={() => setIsFormOpen(true)} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-all shadow-sm active:scale-95">
-              <PlusCircle className="w-5 h-5" />
-              <span className="hidden sm:inline">Nova Transação</span>
-            </button>
-          </div>
+          <button 
+            onClick={() => setIsFormOpen(true)} 
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-all shadow-sm active:scale-95"
+          >
+            <PlusCircle className="w-5 h-5" />
+            <span className="hidden sm:inline">Nova Transação</span>
+          </button>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 print:hidden">
           <div className="flex gap-4 border-b w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
-            <button onClick={() => setActiveTab('dashboard')} className={`pb-4 px-2 font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${activeTab === 'dashboard' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`}>
+            <button 
+              onClick={() => setActiveTab('dashboard')} 
+              className={`pb-4 px-2 font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${activeTab === 'dashboard' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`}
+            >
               <BarChart3 className="w-5 h-5" /> Painel
             </button>
-            <button onClick={() => setActiveTab('history')} className={`pb-4 px-2 font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${activeTab === 'history' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`}>
+            <button 
+              onClick={() => setActiveTab('history')} 
+              className={`pb-4 px-2 font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${activeTab === 'history' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`}
+            >
               <History className="w-5 h-5" /> Histórico
             </button>
-            {selectedCompany === 'SPA' && (
-              <button onClick={() => setActiveTab('erika')} className={`pb-4 px-2 font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${activeTab === 'erika' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`}>
-                <Coins className="w-5 h-5" /> Ganhos Erika
-              </button>
-            )}
+            <button 
+              onClick={() => setActiveTab('erika')} 
+              className={`pb-4 px-2 font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${activeTab === 'erika' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`}
+            >
+              <Coins className="w-5 h-5" /> Ganhos Erika
+            </button>
           </div>
 
           <div className="flex items-center gap-2 bg-white p-2 rounded-2xl shadow-sm border border-slate-100 w-full md:w-auto justify-between">
-            <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400"><ChevronLeft className="w-5 h-5" /></button>
+            <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
             <div className="flex items-center gap-2 px-4">
               <Calendar className="w-4 h-4 text-indigo-500" />
               <span className="font-bold text-slate-700">{MONTHS[selectedDate.getMonth()]} {selectedDate.getFullYear()}</span>
             </div>
-            <button onClick={() => changeMonth(1)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400"><ChevronRight className="w-5 h-5" /></button>
+            <button onClick={() => changeMonth(1)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400">
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
-
-          <button onClick={() => window.print()} className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-semibold"><Download className="w-4 h-4" /> Exportar PDF</button>
         </div>
 
         {activeTab === 'dashboard' ? (
           <div className="max-w-7xl mx-auto space-y-8">
             <SummaryCards summary={summary} />
             
-            <div className="space-y-8">
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <h3 className="text-lg font-semibold mb-6 text-slate-800">Evolução Financeira</h3>
-                <div className="h-[350px]"><CashFlowChart transactions={filteredTransactions} /></div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-8">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                  <h3 className="text-lg font-semibold mb-6 text-slate-800">Evolução Financeira</h3>
+                  <div className="h-[350px]"><CashFlowChart transactions={filteredTransactions} /></div>
+                </div>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                  <TransactionList transactions={filteredTransactions} onDelete={handleDeleteTransaction} />
+                </div>
               </div>
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <TransactionList transactions={filteredTransactions} onDelete={handleDeleteTransaction} />
+              <div className="lg:col-span-1">
+                {/* Display Gemini AI insights in the sidebar */}
+                <AIInsights transactions={filteredTransactions} />
               </div>
             </div>
           </div>
